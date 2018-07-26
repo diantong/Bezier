@@ -1,0 +1,16 @@
+﻿  stdafx.cpp
+  Bezier.cpp
+Bezier.obj : error LNK2019: 无法解析的外部符号 __imp__glewInit@0，该符号在函数 _main 中被引用
+Bezier.obj : error LNK2019: 无法解析的外部符号 _glfwInit，该符号在函数 _main 中被引用
+Bezier.obj : error LNK2019: 无法解析的外部符号 _glfwTerminate，该符号在函数 _main 中被引用
+Bezier.obj : error LNK2019: 无法解析的外部符号 _glfwWindowHint，该符号在函数 _main 中被引用
+Bezier.obj : error LNK2019: 无法解析的外部符号 _glfwCreateWindow，该符号在函数 _main 中被引用
+Bezier.obj : error LNK2019: 无法解析的外部符号 _glfwWindowShouldClose，该符号在函数 _main 中被引用
+Bezier.obj : error LNK2019: 无法解析的外部符号 _glfwPollEvents，该符号在函数 _main 中被引用
+Bezier.obj : error LNK2019: 无法解析的外部符号 _glfwGetKey，该符号在函数 _main 中被引用
+Bezier.obj : error LNK2019: 无法解析的外部符号 _glfwMakeContextCurrent，该符号在函数 _main 中被引用
+Bezier.obj : error LNK2019: 无法解析的外部符号 _glfwSwapBuffers，该符号在函数 _main 中被引用
+Bezier.obj : error LNK2001: 无法解析的外部符号 __imp__glewExperimental
+D:\RiceBowl\OpenGL\Libs\glfw3.lib : warning LNK4272: 库计算机类型“x64”与目标计算机类型“X86”冲突
+D:\RiceBowl\OpenGL\Libs\glew32.lib : warning LNK4272: 库计算机类型“x64”与目标计算机类型“X86”冲突
+c:\users\diantong\documents\visual studio 2015\Projects\Bezier\Debug\Bezier.exe : fatal error LNK1120: 11 个无法解析的外部命令
