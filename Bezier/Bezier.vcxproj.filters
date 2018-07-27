@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="源文件\着色器文件">
+      <UniqueIdentifier>{b40c26d7-8fd9-47d9-983a-0266bfdbc0c8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -32,5 +35,13 @@
     <ClCompile Include="Bezier.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Bezier.fs">
+      <Filter>源文件\着色器文件</Filter>
+    </None>
+    <None Include="Bezier.vs">
+      <Filter>源文件\着色器文件</Filter>
+    </None>
   </ItemGroup>
 </Project>
