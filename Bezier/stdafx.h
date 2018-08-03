@@ -11,7 +11,7 @@
 #include<GLFW\glfw3.h>
 
 #include<iostream>
-#include <tchar.h>
-
+#include<tchar.h>
+#include<vector>
 
 // TODO:  在此处引用程序需要的其他头文件
