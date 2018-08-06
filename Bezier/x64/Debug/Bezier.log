@@ -1,8 +1,10 @@
-﻿  Bezier.cpp
-c:\users\diantong\documents\visual studio 2015\projects\bezier\bezier\bezier.cpp(303): warning C4305: “+=”: 从“double”到“float”截断
-c:\users\diantong\documents\visual studio 2015\projects\bezier\bezier\bezier.cpp(355): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
-c:\users\diantong\documents\visual studio 2015\projects\bezier\bezier\bezier.cpp(356): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
-c:\users\diantong\documents\visual studio 2015\projects\bezier\bezier\bezier.cpp(453): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
-c:\users\diantong\documents\visual studio 2015\projects\bezier\bezier\bezier.cpp(454): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
+﻿  Shader.cpp
+  Bezier.cpp
+c:\users\diantong\documents\visual studio 2015\projects\bezier\bezier\bezier.cpp(252): warning C4305: “+=”: 从“double”到“float”截断
+c:\users\diantong\documents\visual studio 2015\projects\bezier\bezier\bezier.cpp(304): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
+c:\users\diantong\documents\visual studio 2015\projects\bezier\bezier\bezier.cpp(305): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
+c:\users\diantong\documents\visual studio 2015\projects\bezier\bezier\bezier.cpp(402): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
+c:\users\diantong\documents\visual studio 2015\projects\bezier\bezier\bezier.cpp(403): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
+  正在生成代码...
   Bezier.vcxproj -> C:\Users\DianTong\documents\visual studio 2015\Projects\Bezier\x64\Debug\Bezier.exe
   Bezier.vcxproj -> C:\Users\DianTong\documents\visual studio 2015\Projects\Bezier\x64\Debug\Bezier.pdb (Full PDB)

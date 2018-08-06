@@ -54,6 +54,9 @@
     <ClInclude Include="imgui_impl_opengl3.h">
       <Filter>源文件\imgui</Filter>
     </ClInclude>
+    <ClInclude Include="Shader.h">
+      <Filter>源文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -76,6 +79,9 @@
     </ClCompile>
     <ClCompile Include="imgui_impl_opengl3.cpp">
       <Filter>源文件\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader.cpp">
+      <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

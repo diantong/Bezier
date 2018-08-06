@@ -2,6 +2,7 @@
 //
 
 #include "stdafx.h"
+#include "Shader.h"
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
@@ -36,17 +37,6 @@ point2* common = NULL;
 //为Bezierd的动态生成点申请数组
 float* Anibezier = NULL;
 
-//着色器
-const char* vertexShaderSource = "#version 330 core\n"
-                           "layout(location = 0) in vec3 bPos;\n"
-                           "void main() {\n"
-	                           "gl_Position = vec4(bPos.x, bPos.y, bPos.z, 1.0);\n"
-                           "}\0";
-const char* fragmentShaderSource = "#version 330 core\n"
-                                   "out vec4 FragColor;\n"
-                                   "void main() {\n"
-                                       "FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-                                   "};\0";
 const char* glsl_version = "#version 130";
 
 //组合数计算
@@ -69,7 +59,7 @@ bool isAnimation = false;
 //动画时间
 float aniTime = 0;
 
-int main()
+int main() 
 {
 	//初始化GLFW
 	glfwInit();
@@ -178,50 +168,7 @@ int main()
 	glEnableVertexAttribArray(0);
 	glBindVertexArray(0);
 
-	//创建顶点着色器
-	unsigned int vertexShader;
-	vertexShader = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-	glCompileShader(vertexShader);
-	//检查编译状态
-	int success;
-	char infoLog[512];
-	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-	if (!success) {
-		glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" 
-			      << infoLog << std::endl;
-	}
-
-	//创建片元着色器
-	unsigned int fragmentShader;
-	fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-	glCompileShader(fragmentShader);
-	//检查编译状态
-	glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-	if (!success) {
-		glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n"
-			<< infoLog << std::endl;
-	}
-
-	//创建着色器程序
-	unsigned int shaderProgram;
-	shaderProgram = glCreateProgram();
-	glAttachShader(shaderProgram, vertexShader);
-	glAttachShader(shaderProgram, fragmentShader);
-	glLinkProgram(shaderProgram);
-	//删除着色器
-	glDeleteShader(vertexShader);
-	glDeleteShader(fragmentShader);
-	//检查连接状态
-	glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-	if (!success) {
-		glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::PROGRAM::LINK_FAILED\n"
-			<< infoLog << std::endl;
-	}
+	Shader shader("Bezier.vs", "Bezier.fs");
 
 	//渲染周期
 	do {
@@ -245,7 +192,7 @@ int main()
 		*/
 		
 		//使用相应的VAO进行绘制
-		glUseProgram(shaderProgram);
+		shader.use();
 		
 		//绘制Bezier曲线
 		if (currentSize > 1) {
@@ -450,7 +397,7 @@ void ComputeBezier() {
 
 	//根据t依次计算中间的m个点
 	for (int i = 1; i <= m; i++) {
-		double t = i*space;
+		double t = i * space;
 		point2 point = B(t, currentSize - 1, common);
 		Bezier[(i - 1) * 3 + 0] = point.x;
 		Bezier[(i - 1) * 3 + 1] = point.y;
