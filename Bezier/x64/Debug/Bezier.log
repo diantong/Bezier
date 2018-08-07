@@ -1,9 +1,4 @@
-﻿  Curve.cpp
-c:\users\diantong\documents\visual studio 2015\projects\bezier\bezier\curve.cpp(107): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
-c:\users\diantong\documents\visual studio 2015\projects\bezier\bezier\curve.cpp(108): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
-c:\users\diantong\documents\visual studio 2015\projects\bezier\bezier\curve.cpp(182): warning C4305: “+=”: 从“double”到“float”截断
-  Bezier.cpp
-c:\users\diantong\documents\visual studio 2015\projects\bezier\bezier\bezier.cpp(148): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
-  正在生成代码...
-  Bezier.vcxproj -> C:\Users\DianTong\documents\visual studio 2015\Projects\Bezier\x64\Debug\Bezier.exe
-  Bezier.vcxproj -> C:\Users\DianTong\documents\visual studio 2015\Projects\Bezier\x64\Debug\Bezier.pdb (Full PDB)
+﻿  Bezier.cpp
+c:\users\diantong\documents\visual studio 2015\projects\bezier\bezier\bezier.cpp(116): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
+  Bezier.vcxproj -> C:\Users\DianTong\Documents\Visual Studio 2015\Projects\Bezier\x64\Debug\Bezier.exe
+  Bezier.vcxproj -> C:\Users\DianTong\Documents\Visual Studio 2015\Projects\Bezier\x64\Debug\Bezier.pdb (Full PDB)

@@ -9,6 +9,8 @@ Curve::Curve(int _maxSize, int _m):maxSize(_maxSize), m(_m), currentSize(0), isU
 	Bezier = new float[m * 3];
 	Anibezier = new float[maxSize * 3];
 	common = new point2[maxSize];
+	//openGL初始化
+	GLInit();
 }
 
 //初始化

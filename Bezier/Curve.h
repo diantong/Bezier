@@ -28,9 +28,6 @@ public:
 	Curve(int _maxSize, int _m);
 	//析构函数
 	~Curve();
-
-	//opengl初始化
-	void GLInit();
 	
 	//计算Bezier
 	void ComputeBezier();
@@ -76,6 +73,8 @@ private:
 	//预计算部分
 	point2* common = NULL;
 
+	//opengl初始化
+	void GLInit();
 	//组合数计算
 	double C(int n, int m);
 	//根据t计算插值点
