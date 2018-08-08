@@ -168,6 +168,7 @@
     <ClInclude Include="stb_textedit.h" />
     <ClInclude Include="stb_truetype.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="Surface.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
@@ -185,10 +186,13 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Surface.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Bezier.fs" />
-    <None Include="Bezier.vs" />
+    <None Include="Curve.fs" />
+    <None Include="Curve.vs" />
+    <None Include="Surface.fs" />
+    <None Include="Surface.vs" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

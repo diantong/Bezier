@@ -60,6 +60,9 @@
     <ClInclude Include="Curve.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Surface.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -89,12 +92,21 @@
     <ClCompile Include="Curve.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="Surface.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Bezier.fs">
+    <None Include="Curve.fs">
       <Filter>源文件\着色器文件</Filter>
     </None>
-    <None Include="Bezier.vs">
+    <None Include="Curve.vs">
+      <Filter>源文件\着色器文件</Filter>
+    </None>
+    <None Include="Surface.fs">
+      <Filter>源文件\着色器文件</Filter>
+    </None>
+    <None Include="Surface.vs">
       <Filter>源文件\着色器文件</Filter>
     </None>
   </ItemGroup>

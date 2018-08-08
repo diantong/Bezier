@@ -3,6 +3,7 @@
 #include "stdafx.h"
 #include "Shader.h"
 #include "Curve.h"
+#include "Surface.h"
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
@@ -55,6 +56,9 @@ int main()  {
 		return -1;
 	}
 
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
+
 	glViewport(0, 0, WIDTH, HEIGHT);
 	glfwSetCursorPos(window, WIDTH / 2, HEIGHT / 2);
 	
@@ -62,6 +66,30 @@ int main()  {
 	//VAO对象创建前需要等待GLEW初始化完毕，之前curve是全局变量，如果在构造函数中对VAO、VBO进行初始化将造成访问冲突。
 	//现在curve是局部变量，并且在GLEW初始化完毕后进行声明，故原GLinit可以直接在构造函数中进行
 	Curve curve(100, 99);
+
+	//曲面
+	Surface surface(4, 4, 20, 20);
+	//对曲面进行计算
+	surface.ComputeBezier();
+	//对三角网格进行计算
+	surface.ctrlMesh();
+	//对曲面网格进行计算
+	surface.BezierMesh();
+
+	//着色器程序
+	Shader curve_shader("Curve.vs", "Curve.fs");
+	Shader surface_shader("Surface.vs", "Surface.fs");
+
+	//变换矩阵
+	glm::mat4 model(1.0f);
+	glm::vec3 cameraPos = glm::vec3(0.5f, 0.5f, 2.5f);
+	glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
+	glm::mat4 view = glm::lookAt(cameraPos, cameraTarget, glm::vec3(0.0f, 1.0f, 0.0f));
+	glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)WIDTH / (float)HEIGHT, 0.1f, 100.0f);
+	surface_shader.use();
+	surface_shader.setMat4("mvp", projection * view * model);
+	curve_shader.use();
+	curve_shader.setMat4("mvp", projection * view * model);
 
 	// Setup Dear ImGui binding
 	IMGUI_CHECKVERSION();
@@ -75,17 +103,14 @@ int main()  {
 	// Setup style
 	ImGui::StyleColorsDark();
 
-	//着色器程序
-	Shader shader("Bezier.vs", "Bezier.fs");
-
 	//展示窗口
 	Window show = none;
 
 	//渲染周期
 	do {
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT);
-		
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 		//开始新一帧的渲染
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
@@ -93,8 +118,14 @@ int main()  {
 		//UI
 		if (ImGui::BeginMainMenuBar()) {
 			if (ImGui::BeginMenu("Bezier")) {
-				if (ImGui::MenuItem("Curve")) { show = bezier_curve; }
-				if (ImGui::MenuItem("Surface")) { show = bezier_surface; }
+				if (ImGui::MenuItem("Curve")) { 
+					show = bezier_curve; 
+					glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+				}
+				if (ImGui::MenuItem("Surface")) { 
+					show = bezier_surface; 
+					glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+				}
 				ImGui::EndMenu();
 			}
 			ImGui::EndMainMenuBar();
@@ -127,7 +158,7 @@ int main()  {
 				//检查曲线更新
 				curve.Update();
 				//使用相应的VAO进行绘制
-				shader.use();
+				curve_shader.use();
 				//绘制Bezier曲线
 				curve.DrawBezier();
 				//绘制控制点
@@ -137,8 +168,14 @@ int main()  {
 				break;
 			}
 			//Bezier曲面
-			case bezier_surface:
+			case bezier_surface: {
+				curve_shader.use();
+				surface.DrawCtrlPoints();
+				surface_shader.use();
+				surface.DrawCtrlMesh();
+				surface.DrawBezierMesh();
 				break;
+			}
 			case none:
 				break;
 			default:

@@ -1,4 +1,4 @@
 ﻿  Bezier.cpp
-c:\users\diantong\documents\visual studio 2015\projects\bezier\bezier\bezier.cpp(116): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
-  Bezier.vcxproj -> C:\Users\DianTong\Documents\Visual Studio 2015\Projects\Bezier\x64\Debug\Bezier.exe
-  Bezier.vcxproj -> C:\Users\DianTong\Documents\Visual Studio 2015\Projects\Bezier\x64\Debug\Bezier.pdb (Full PDB)
+c:\users\diantong\documents\visual studio 2015\projects\bezier\bezier\bezier.cpp(147): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
+  Bezier.vcxproj -> C:\Users\DianTong\documents\visual studio 2015\Projects\Bezier\x64\Debug\Bezier.exe
+  Bezier.vcxproj -> C:\Users\DianTong\documents\visual studio 2015\Projects\Bezier\x64\Debug\Bezier.pdb (Full PDB)
