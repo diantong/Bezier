@@ -4,17 +4,26 @@
 //构造函数
 Surface::Surface(int _row, int _column, int mrow, int mcolumn): row(_row), column(_column), m_row(mrow), m_column(mcolumn) {
 	//计算间隔
-	//将[0, 1]区间分为m_row与m_column段
 	space_row = 1.0f / (float)m_row;
 	space_column = 1.0f / (float)m_column;
 
 	//对不同的(u, v)得到的相应的曲面点进行存储
 	Bezier = new float[(m_row + 1)*(m_column + 1) * 3];
 
+	//对共有部分进行存储
+	common = new point3*[row];
+	for (int i = 0; i < row; i++)
+		common[i] = new point3[column];
+
 	//一个四边形有6个顶点索引
 	b_index = new unsigned int[m_row * m_column * 6];
 	c_index = new unsigned int[(row - 1)*(column - 1) * 6];
 
+	//openGL
+	GLInit();
+}
+
+void Surface::GLInit() {
 	//openGL
 	//控制点
 	glGenVertexArrays(1, &cvao);
@@ -51,7 +60,10 @@ Surface::~Surface() {
 	delete[] Bezier;
 	delete[] b_index;
 	delete[] c_index;
-	
+	for (int i = 0; i < row; i++)
+		delete[] common[i];
+	delete[] common;
+
 	//删除
 	glDeleteVertexArrays(1, &cvao);
 	glDeleteBuffers(1, &cvbo);
@@ -83,11 +95,6 @@ double Surface::C(int n, int m) {
 	return exp(first - second);
 }
 
-//根据给定的t计算点
-double Surface::B(int i, int n, double u) {
-	return C(n, i) * pow(u, i) * pow(1 - u, n - i);
-}
-
 //根据给定的u、v值计算曲面点
 point3 Surface::P(double u, double v) {
 	point3 result;
@@ -95,10 +102,10 @@ point3 Surface::P(double u, double v) {
 		for (int j = 0; j < column; j++) {
 			//根据(i, j)获取相应的控制点
 			int pos = (i * row + j) * 3;
-			double c = B(i, row - 1, u) * B(j, column - 1, v);
-			result.x += ctrlPoint[pos + 0] * c;
-			result.y += ctrlPoint[pos + 1] * c;
-			result.z += ctrlPoint[pos + 2] * c;
+			double c = pow(u, i) * pow(1 - u, row - 1 - i) * pow(v, j) * pow(1 - v, column - 1 - j);
+			result.x += common[i][j].x * c;
+			result.y += common[i][j].y * c;
+			result.z += common[i][j].z * c;
 		}
 	}
 	return result;
@@ -106,6 +113,17 @@ point3 Surface::P(double u, double v) {
 
 //计算Bezier曲面
 void Surface::ComputeBezier() {
+	//计算公共部分
+	for(int i = 0; i < row; i++)
+		for (int j = 0; j < column; j++) {
+			int pos = (i * row + j) * 3;
+			double c = C(row - 1, i) * C(column - 1, j);
+			common[i][j].x = c * ctrlPoint[pos + 0];
+			common[i][j].y = c * ctrlPoint[pos + 1];
+			common[i][j].z = c * ctrlPoint[pos + 2];
+		}
+
+	//计算曲面点
 	double u, v = 0;
 	for (int i = 0; i <= m_row; i++) {
 		u = i * space_row;
@@ -116,18 +134,15 @@ void Surface::ComputeBezier() {
 			Bezier[pos + 0] = point.x;
 			Bezier[pos + 1] = point.y;
 			Bezier[pos + 2] = point.z;
-			std::cout << "(" << Bezier[pos + 0] << ", " << Bezier[pos + 1] << ", " << Bezier[pos + 2] << ")" << std::endl;
 		}
 	}
 
+	//更新缓冲
 	glBindBuffer(GL_ARRAY_BUFFER, bvbo);
 	glBufferSubData(GL_ARRAY_BUFFER, 0, (m_row + 1) * (m_column + 1) * 3 * sizeof(float), Bezier);
 }
 
-//根据离散的控制点或计算点绘制网格
-//想使用索引缓冲，首先对所有三角面片的顶点索引并存储，最后直接去数组中获取数据
-//也可以获取了一个四边形的四个定点后立即绘制，但是一个缺点就是每次绘制都需要对四个顶点进行计算
-//我想的是先预计算所有的索引，然后每次绘制都可以直接使用
+//根据离散的控制点或计算点绘制网格， 预计算所有的索引
 void Surface::ComputeMesh(int row, int column, unsigned int* index, unsigned int ebo) {
 	for (int i = 0; i < row - 1; i++) {
 		for (int j = 0; j < column - 1; j++) {
@@ -135,7 +150,6 @@ void Surface::ComputeMesh(int row, int column, unsigned int* index, unsigned int
 			int v2 = i * row + j + 1;
 			int v3 = v1 + row;
 			int v4 = v2 + row;
-			std::cout << v1 << " " << v2 << " " << v3 << " " << v4 << std::endl;
 			//当前计算的是第pos个四边形
 			int pos = (i * (row - 1) + j) * 6;
 			index[pos + 0] = v1;
@@ -151,22 +165,24 @@ void Surface::ComputeMesh(int row, int column, unsigned int* index, unsigned int
 	glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, (row - 1) * (column - 1) * 6 * sizeof(unsigned int), index); 
 }
 
-//控制点网格
+//计算控制点网格
 void Surface::ctrlMesh() {
 	ComputeMesh(row, column, c_index, cebo);
 }
 
-//Bezier网格
+//计算Bezier网格
 void Surface::BezierMesh() {
 	ComputeMesh(m_row + 1, m_column + 1, b_index, bebo);
 }
 
+//绘制Bezier网格
 void Surface::DrawBezierMesh() {
 	glBindVertexArray(bvao);
 	glDrawElements(GL_TRIANGLES, m_row * m_column * 6, GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
 }
 
+//绘制控制点网格
 void Surface::DrawCtrlMesh() {
 	glBindVertexArray(cvao);
 	glDrawElements(GL_TRIANGLES, (row - 1) * (column - 1) * 6, GL_UNSIGNED_INT, 0);
@@ -178,6 +194,5 @@ void Surface::DrawCtrlPoints() {
 	glBindVertexArray(cvao);
 	glPointSize(5.0f);
 	glDrawArrays(GL_POINTS, 0, row * column);
-	//glDrawArrays(GL_LINE_STRIP, 0, 12);
 	glBindVertexArray(0);
 }

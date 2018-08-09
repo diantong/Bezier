@@ -19,7 +19,6 @@ public:
 	~Surface();
 
 	//绘制曲面
-	void ComputeMesh(int row, int column, unsigned int* index, unsigned int ebo);
 	void ctrlMesh();
 	void BezierMesh();
 	void ComputeBezier();
@@ -48,6 +47,8 @@ private:
 
 	//Bezier曲面
 	float* Bezier = NULL;
+	//对于每个u、v，在计算过程中有一部分都是相同的，不需要每次都进行重复计算
+	point3** common = NULL;
 
 	//三角面片索引
 	unsigned int* b_index = NULL;
@@ -76,12 +77,14 @@ private:
 		 0.75f, -0.50f,  0.75f
 	};
 
+	//openGL初始化
+	void GLInit();
 	//组合数计算
 	double C(int n, int m);
-	//Bernstein基函数
-	double B(int i, int n, double t);
 	//根据u, v计算插值点
 	point3 P(double u, double v);
+	//计算网格
+	void ComputeMesh(int row, int column, unsigned int* index, unsigned int ebo);
 };
 
 #endif // !SURFACE_H

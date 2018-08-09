@@ -76,28 +76,32 @@ int main()  {
 	//对曲面网格进行计算
 	surface.BezierMesh();
 
-	//着色器程序
-	Shader curve_shader("Curve.vs", "Curve.fs");
-	Shader surface_shader("Surface.vs", "Surface.fs");
-
 	//变换矩阵
 	glm::mat4 model(1.0f);
 	glm::vec3 cameraPos = glm::vec3(0.5f, 0.5f, 2.5f);
 	glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
 	glm::mat4 view = glm::lookAt(cameraPos, cameraTarget, glm::vec3(0.0f, 1.0f, 0.0f));
 	glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)WIDTH / (float)HEIGHT, 0.1f, 100.0f);
+	
+	//着色器程序
+	Shader curve_shader("Curve.vs", "Curve.fs");
+	curve_shader.use();
+	curve_shader.setVec3("color", glm::vec3(0.6f, 0.6f, 0.6f));
+
+	Shader surface_shader("Surface.vs", "Surface.fs");
 	surface_shader.use();
 	surface_shader.setMat4("mvp", projection * view * model);
-	curve_shader.use();
-	curve_shader.setMat4("mvp", projection * view * model);
+
+	Shader ctrl_shader("Surface.vs", "Curve.fs");
+	ctrl_shader.use();
+	ctrl_shader.setMat4("mvp", projection * view * model);
+	ctrl_shader.setVec3("color", glm::vec3(1.0f, 0.0f, 0.0f));
 
 	// Setup Dear ImGui binding
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
-	//io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;  // Enable Keyboard Controls
-	//io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;   // Enable Gamepad Controls
-	
+
 	ImGui_ImplGlfw_InitForOpenGL(window, true);
 	ImGui_ImplOpenGL3_Init(glsl_version);
 	// Setup style
@@ -115,16 +119,15 @@ int main()  {
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
+
 		//UI
 		if (ImGui::BeginMainMenuBar()) {
 			if (ImGui::BeginMenu("Bezier")) {
 				if (ImGui::MenuItem("Curve")) { 
 					show = bezier_curve; 
-					glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 				}
 				if (ImGui::MenuItem("Surface")) { 
 					show = bezier_surface; 
-					glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 				}
 				ImGui::EndMenu();
 			}
@@ -157,22 +160,23 @@ int main()  {
 
 				//检查曲线更新
 				curve.Update();
-				//使用相应的VAO进行绘制
+				//曲线、控制点、动画
 				curve_shader.use();
-				//绘制Bezier曲线
 				curve.DrawBezier();
-				//绘制控制点
 				curve.DrawCtrlPoints();
-				//绘制生成动画
 				curve.DrawDynamic();
 				break;
 			}
 			//Bezier曲面
 			case bezier_surface: {
-				curve_shader.use();
+				//控制点
+				ctrl_shader.use();
 				surface.DrawCtrlPoints();
+				//网格
 				surface_shader.use();
+				glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 				surface.DrawCtrlMesh();
+				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 				surface.DrawBezierMesh();
 				break;
 			}
