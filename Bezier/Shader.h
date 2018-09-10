@@ -13,7 +13,8 @@ public:
 	unsigned int ID;
 
 	//构造函数
-	Shader(const char* vertexPath, const char* fragmentPath);
+	Shader(const char* vertexPath, const char* fragmentPath, const char* tessCtrlPath = NULL, const char* tessEvalPath = NULL);
+
 	//激活着色器程序
 	void use();
 	//uniform

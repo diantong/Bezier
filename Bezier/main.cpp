@@ -26,8 +26,8 @@ int main()  {
 	//初始化GLFW
 	glfwInit();
 	//将主版本号与次版本号设置为3 
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 	//核心模式(可编程管线)
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
@@ -62,24 +62,26 @@ int main()  {
 	glViewport(0, 0, WIDTH, HEIGHT);
 	glfwSetCursorPos(window, WIDTH / 2, HEIGHT / 2);
 	
-	//使用imgui对鼠标和键盘输入事件进行监听后，将Curve转变为局部变量而不需要全局
-	//VAO对象创建前需要等待GLEW初始化完毕，之前curve是全局变量，如果在构造函数中对VAO、VBO进行初始化将造成访问冲突。
-	//现在curve是局部变量，并且在GLEW初始化完毕后进行声明，故原GLinit可以直接在构造函数中进行
 	Curve curve(100, 99);
 
 	//曲面
-	Surface surface(4, 4, 20, 20);
+	Surface surface(4, 4, 4, 4);
 	//对曲面进行计算
 	surface.ComputeBezier();
-	//对三角网格进行计算
 	surface.ctrlMesh();
-	//对曲面网格进行计算
 	surface.BezierMesh();
 
 	//变换矩阵
 	glm::mat4 model(1.0f);
-	glm::vec3 cameraPos = glm::vec3(0.5f, 0.5f, 2.5f);
+
+	glm::vec3 worldUp = glm::vec3(0.0f, 1.0f, 0.0f);
+	glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 2.5f);
 	glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
+	//摄像机坐标轴
+	glm::vec3 Front = glm::normalize(cameraTarget - cameraPos);
+	glm::vec3 Right = glm::normalize(glm::cross(Front, worldUp));
+	glm::vec3 Up = glm::normalize(glm::cross(Right, Front));
+
 	glm::mat4 view = glm::lookAt(cameraPos, cameraTarget, glm::vec3(0.0f, 1.0f, 0.0f));
 	glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)WIDTH / (float)HEIGHT, 0.1f, 100.0f);
 	
@@ -109,6 +111,14 @@ int main()  {
 
 	//展示窗口
 	Window show = none;
+	
+	//鼠标点击
+	bool firstMouseDown = true;
+	double downX;
+	double downY;
+	double offsetX = 0;
+	double offsetY = 0;
+	const float SENSITIVITY = 0.01f;
 
 	//渲染周期
 	do {
@@ -146,21 +156,18 @@ int main()  {
 					//将x/y转换到NDC
 					x = -1 + 2 * (x / WIDTH);
 					y = 1 - 2 * (y / HEIGHT);
-					//添加控制点
 					bool success = curve.push(x, y);
 				}
 				//检测右键点击事件
 				if (ImGui::IsMouseClicked(1)) {
-					//删除控制点
 					bool success = curve.pop();
 				}
 				//检测O键点击事件
 				if (ImGui::IsKeyPressed(GLFW_KEY_O))
 					curve.AniSwitch();
 
-				//检查曲线更新
-				curve.Update();
 				//曲线、控制点、动画
+				curve.Update();
 				curve_shader.use();
 				curve.DrawBezier();
 				curve.DrawCtrlPoints();
@@ -169,6 +176,35 @@ int main()  {
 			}
 			//Bezier曲面
 			case bezier_surface: {
+				//对鼠标左键按下事件进行监听
+				if (ImGui::IsMouseDown(0)) {
+					//刚按下时记录当前光标的位置
+					if (firstMouseDown) {
+						downX = ImGui::GetMousePos().x;
+						//Up = glm::rotate(glm::mat4(1.0f), (float)offsetY, cameraTarget + Right) * glm::vec4(Up, 1.0f);
+						cameraPos = glm::rotate(glm::mat4(1.0f), (float)offsetX, cameraTarget + Up) * 
+							        glm::vec4(cameraPos, 1.0f);
+						firstMouseDown = false;
+					} else{
+						//计算偏移量
+						offsetX = downX - ImGui::GetMousePos().x;
+						offsetX *= SENSITIVITY;
+						
+						//旋转摄像机
+						glm::vec3 newPos = glm::rotate(glm::mat4(1.0f), (float)offsetX, cameraTarget + Up) *
+							               glm::vec4(cameraPos, 1.0f);
+						view = glm::lookAt(newPos, cameraTarget, worldUp);
+				
+						//更改着色器
+						surface_shader.use();
+						surface_shader.setMat4("mvp", projection * view * model);
+						ctrl_shader.use();
+						ctrl_shader.setMat4("mvp", projection * view * model);
+					}
+				}
+				else
+					firstMouseDown = true;
+	
 				//控制点
 				ctrl_shader.use();
 				surface.DrawCtrlPoints();
@@ -176,7 +212,7 @@ int main()  {
 				surface_shader.use();
 				glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 				surface.DrawCtrlMesh();
-				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+				//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 				surface.DrawBezierMesh();
 				break;
 			}

@@ -192,6 +192,8 @@
     <None Include="Curve.fs" />
     <None Include="Curve.vs" />
     <None Include="Surface.fs" />
+    <None Include="Surface.tc" />
+    <None Include="Surface.te" />
     <None Include="Surface.vs" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

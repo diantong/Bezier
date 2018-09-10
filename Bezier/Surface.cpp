@@ -51,6 +51,8 @@ void Surface::GLInit() {
 	glGenBuffers(1, &bebo);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bebo);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_row * m_column * 6 * sizeof(unsigned int), NULL, GL_STATIC_DRAW);
+	//自定义Patch顶点个数
+	//glPatchParameteri(GL_PATCH_VERTICES, 3);
 	glBindVertexArray(0);
 }
 

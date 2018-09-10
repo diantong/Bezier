@@ -109,5 +109,11 @@
     <None Include="Surface.vs">
       <Filter>源文件\着色器文件</Filter>
     </None>
+    <None Include="Surface.tc">
+      <Filter>源文件\着色器文件</Filter>
+    </None>
+    <None Include="Surface.te">
+      <Filter>源文件\着色器文件</Filter>
+    </None>
   </ItemGroup>
 </Project>

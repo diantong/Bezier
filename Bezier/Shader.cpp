@@ -1,35 +1,55 @@
 #include "stdafx.h"
 #include "Shader.h"
 
-Shader::Shader(const char* vertexPath, const char* fragmentPath) {
+Shader::Shader(const char* vertexPath, const char* fragmentPath, const char* tessCtrlPath, const char* tessEvalPath) {
 	// 1. 从文件路径中获取顶点/片段着色器
 	std::string vertexCode;
 	std::string fragmentCode;
+	std::string tessCtrlCode;
+	std::string tessEvalCode;
 	std::ifstream vShaderFile;
 	std::ifstream fShaderFile;
+	std::ifstream tcShaderFile;
+	std::ifstream teShaderFile;
 	// 保证ifstream对象可以抛出异常：
 	vShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
 	fShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+	tcShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+	teShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
 	try {
+		std::stringstream vShaderStream, fShaderStream, tcShaderStream, teShaderStream;
 		// 打开文件
 		vShaderFile.open(vertexPath);
-		fShaderFile.open(fragmentPath);
-		std::stringstream vShaderStream, fShaderStream;
-		// 读取文件的缓冲内容到数据流中
 		vShaderStream << vShaderFile.rdbuf();
-		fShaderStream << fShaderFile.rdbuf();
-		// 关闭文件处理器
 		vShaderFile.close();
-		fShaderFile.close();
-		// 转换数据流到string
 		vertexCode = vShaderStream.str();
+
+		fShaderFile.open(fragmentPath);
+		fShaderStream << fShaderFile.rdbuf();
+		fShaderFile.close();
 		fragmentCode = fShaderStream.str();
+
+		if (tessCtrlPath != NULL) {
+			tcShaderFile.open(tessCtrlPath);
+			tcShaderStream << tcShaderFile.rdbuf();
+			tcShaderFile.close();
+			tessCtrlCode = tcShaderStream.str();
+		}
+
+		if (tessEvalPath != NULL) {
+			teShaderFile.open(tessEvalPath);
+			teShaderStream << teShaderFile.rdbuf();
+			teShaderFile.close();
+			tessEvalCode = teShaderStream.str();
+		}
+		
 	}
 	catch (std::ifstream::failure e) {
 		std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ" << std::endl;
 	}
 	const char* vertexShaderSource = vertexCode.c_str();
 	const char* fragmentShaderSource = fragmentCode.c_str();
+
 
 	//创建顶点着色器
 	unsigned int vertexShader;
@@ -59,10 +79,46 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath) {
 			<< infoLog << std::endl;
 	}
 
+	//创建细分控制着色器
+	unsigned int tessCtrlShader;
+	if (tessCtrlPath != NULL) {
+		const char* tessCtrlShaderSource = tessCtrlCode.c_str();
+		tessCtrlShader = glCreateShader(GL_TESS_CONTROL_SHADER);
+		glShaderSource(tessCtrlShader, 1, &tessCtrlShaderSource, NULL);
+		glCompileShader(tessCtrlShader);
+		//检查编译状态
+		glGetShaderiv(tessCtrlShader, GL_COMPILE_STATUS, &success);
+		if (!success) {
+			glGetShaderInfoLog(tessCtrlShader, 512, NULL, infoLog);
+			std::cout << "ERROR::SHADER::TESSCTRL::COMPILATION_FAILED\n"
+				<< infoLog << std::endl;
+		}
+	}
+
+	//创建细分计算着色器
+	unsigned int tessEvalShader;
+	if (tessEvalPath != NULL) {
+		const char* tessEvalShaderSource = tessEvalCode.c_str();
+		tessEvalShader = glCreateShader(GL_TESS_EVALUATION_SHADER);
+		glShaderSource(tessEvalShader, 1, &tessEvalShaderSource, NULL);
+		glCompileShader(tessEvalShader);
+		//检查编译状态
+		glGetShaderiv(tessEvalShader, GL_COMPILE_STATUS, &success);
+		if (!success) {
+			glGetShaderInfoLog(tessEvalShader, 512, NULL, infoLog);
+			std::cout << "ERROR::SHADER::TESSEval::COMPILATION_FAILED\n"
+				<< infoLog << std::endl;
+		}
+	}
+
 	//创建着色器程序
 	ID = glCreateProgram();
 	glAttachShader(ID, vertexShader);
 	glAttachShader(ID, fragmentShader);
+	if(tessCtrlPath != NULL)
+		glAttachShader(ID, tessCtrlShader);
+	if (tessEvalPath != NULL)
+		glAttachShader(ID, tessEvalShader);
 	glLinkProgram(ID);
 	//检查连接状态
 	glGetProgramiv(ID, GL_LINK_STATUS, &success);
@@ -75,6 +131,10 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath) {
 	//删除着色器
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
+	if (tessCtrlPath != NULL)
+		glDeleteShader(tessCtrlShader);
+	if (tessEvalPath != NULL)
+		glDeleteShader(tessEvalShader);
 }
 
 void Shader::use() {
