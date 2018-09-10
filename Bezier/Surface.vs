@@ -1,8 +1,10 @@
-#version 400 core
+#version 410 core
 layout (location = 0) in vec3 bPos;
 
 uniform mat4 mvp;
 
+out vec4 vPosition; 
+
 void main()  {
-	gl_Position = mvp * vec4(bPos.x, bPos.y, bPos.z, 1.0);
+	vPosition = mvp * vec4(bPos.xyz, 1.0);
 }

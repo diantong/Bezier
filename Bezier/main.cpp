@@ -27,7 +27,7 @@ int main()  {
 	glfwInit();
 	//将主版本号与次版本号设置为3 
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
 	//核心模式(可编程管线)
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
@@ -90,11 +90,12 @@ int main()  {
 	curve_shader.use();
 	curve_shader.setVec3("color", glm::vec3(0.6f, 0.6f, 0.6f));
 
-	Shader surface_shader("Surface.vs", "Surface.fs");
+	//加入着色控制器
+	Shader surface_shader("Surface.vs", "Surface.fs", "Surface.tc", "Surface.te");
 	surface_shader.use();
 	surface_shader.setMat4("mvp", projection * view * model);
 
-	Shader ctrl_shader("Surface.vs", "Curve.fs");
+	Shader ctrl_shader("Surface_ctrl.vs", "Curve.fs");
 	ctrl_shader.use();
 	ctrl_shader.setMat4("mvp", projection * view * model);
 	ctrl_shader.setVec3("color", glm::vec3(1.0f, 0.0f, 0.0f));
@@ -181,7 +182,6 @@ int main()  {
 					//刚按下时记录当前光标的位置
 					if (firstMouseDown) {
 						downX = ImGui::GetMousePos().x;
-						//Up = glm::rotate(glm::mat4(1.0f), (float)offsetY, cameraTarget + Right) * glm::vec4(Up, 1.0f);
 						cameraPos = glm::rotate(glm::mat4(1.0f), (float)offsetX, cameraTarget + Up) * 
 							        glm::vec4(cameraPos, 1.0f);
 						firstMouseDown = false;
@@ -208,10 +208,10 @@ int main()  {
 				//控制点
 				ctrl_shader.use();
 				surface.DrawCtrlPoints();
-				//网格
-				surface_shader.use();
 				glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-				surface.DrawCtrlMesh();
+				//surface.DrawCtrlMesh();
+
+				surface_shader.use();
 				//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 				surface.DrawBezierMesh();
 				break;

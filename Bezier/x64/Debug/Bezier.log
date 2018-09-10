@@ -1,15 +1,10 @@
-﻿  Surface.cpp
+﻿  main.cpp
+c:\users\diantong\documents\visual studio 2015\projects\bezier\bezier\main.cpp(160): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
+c:\users\diantong\documents\visual studio 2015\projects\bezier\bezier\main.cpp(119): warning C4101: “downY”: 未引用的局部变量
+  Surface.cpp
 c:\users\diantong\documents\visual studio 2015\projects\bezier\bezier\surface.cpp(136): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
 c:\users\diantong\documents\visual studio 2015\projects\bezier\bezier\surface.cpp(137): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
 c:\users\diantong\documents\visual studio 2015\projects\bezier\bezier\surface.cpp(138): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
-  Shader.cpp
   正在生成代码...
-  正在编译...
-  main.cpp
-c:\users\diantong\documents\visual studio 2015\projects\bezier\bezier\main.cpp(159): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
-c:\users\diantong\documents\visual studio 2015\projects\bezier\bezier\main.cpp(118): warning C4101: “downY”: 未引用的局部变量
-  正在生成代码...
-  正在跳过...(未检测到相关更改)
-  Curve.cpp
   Bezier.vcxproj -> C:\Users\DianTong\documents\visual studio 2015\Projects\Bezier\x64\Debug\Bezier.exe
   Bezier.vcxproj -> C:\Users\DianTong\documents\visual studio 2015\Projects\Bezier\x64\Debug\Bezier.pdb (Full PDB)

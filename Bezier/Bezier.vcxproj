@@ -195,6 +195,7 @@
     <None Include="Surface.tc" />
     <None Include="Surface.te" />
     <None Include="Surface.vs" />
+    <None Include="Surface_ctrl.vs" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

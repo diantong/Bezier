@@ -52,7 +52,7 @@ void Surface::GLInit() {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bebo);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_row * m_column * 6 * sizeof(unsigned int), NULL, GL_STATIC_DRAW);
 	//自定义Patch顶点个数
-	//glPatchParameteri(GL_PATCH_VERTICES, 3);
+	glPatchParameteri(GL_PATCH_VERTICES, 3);
 	glBindVertexArray(0);
 }
 
@@ -180,7 +180,7 @@ void Surface::BezierMesh() {
 //绘制Bezier网格
 void Surface::DrawBezierMesh() {
 	glBindVertexArray(bvao);
-	glDrawElements(GL_TRIANGLES, m_row * m_column * 6, GL_UNSIGNED_INT, 0);
+	glDrawElements(GL_PATCHES, m_row * m_column * 6, GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
 }
 
