@@ -1,10 +1,14 @@
 #version 410 core
 layout(vertices = 3) out;
 in vec4 vPosition[];
+in vec2 tcuvPosition[];
+
 out vec4 tcPosition[];
+out vec2 teuvPosition[];
 
 void main() {
 	tcPosition[gl_InvocationID] = vPosition[gl_InvocationID];
+	teuvPosition[gl_InvocationID] = tcuvPosition[gl_InvocationID];
 	if (gl_InvocationID == 0) {
 		gl_TessLevelInner[0] = 3;
 		gl_TessLevelOuter[0] = 3;

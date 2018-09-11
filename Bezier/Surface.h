@@ -26,9 +26,13 @@ public:
 	void DrawCtrlPoints();
 	void DrawBezierMesh();
 
-private:
 	//记录当前曲面大小
 	int row, column;
+
+	//对于每个u、v，在计算过程中
+	float* common = NULL;
+
+private:
 
 	//横向与纵向插值点
 	int m_row, m_column;
@@ -44,11 +48,11 @@ private:
 	unsigned int bvao;
 	unsigned int bvbo;
 	unsigned int bebo;
+	unsigned int uvvbo;
 
 	//Bezier曲面
 	float* Bezier = NULL;
-	//对于每个u、v，在计算过程中有一部分都是相同的，不需要每次都进行重复计算
-	point3** common = NULL;
+	float* UV = NULL;
 
 	//三角面片索引
 	unsigned int* b_index = NULL;

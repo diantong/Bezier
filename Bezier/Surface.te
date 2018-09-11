@@ -1,10 +1,54 @@
-#version 410 core
+#version 430 core
 layout (triangles, equal_spacing, ccw) in;
 in vec4 tcPosition[];
+in vec2 teuvPosition[];
+
+uniform mat4 mvp;
+uniform float common[48];
+
+//组合数计算
+float C(int n, int m) {
+	if (m > n)
+		return 0;
+	if (m < n / 2.0)
+		m = n - m;
+
+	float first = 0;
+	for (int i = m + 1; i <= n; i++)
+		first += log(float(i));
+	float second = 0;
+	int upper = n - m;
+	for (int i = 2; i <= upper; i++)
+		second += log(float(i));
+
+	return exp(first - second);
+}
+
+//根据给定的u、v值计算曲面点
+vec3 P(float u, float v) {
+	vec3 result;
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 4; j++) {
+			//根据(i, j)获取相应的控制点
+			int pos = (i * 4 + j) * 3;
+			float c = pow(u, i) * pow(1 - u, 4 - 1 - i) * pow(v, j) * pow(1 - v, 4 - 1 - j);
+			result.x += common[pos + 0] * c;
+			result.y += common[pos + 1] * c;
+			result.z += common[pos + 2] * c;
+		}
+	}
+	return result;
+}
 
 void main()  {
-	vec4 p0 = gl_TessCoord.x * tcPosition[0];
-	vec4 p1 = gl_TessCoord.y * tcPosition[1];
-	vec4 p2 = gl_TessCoord.z * tcPosition[2];
-	gl_Position = p0 + p1 + p2;
+	vec2 p0 = gl_TessCoord.x * teuvPosition[0];
+	vec2 p1 = gl_TessCoord.y * teuvPosition[1];
+	vec2 p2 = gl_TessCoord.z * teuvPosition[2];
+	vec2 uv = p0 + p1 + p2;
+	gl_Position = mvp * vec4(P(uv.x, uv.y), 1.0);
+
+	//vec4 p0 = gl_TessCoord.x * tcPosition[0];
+	//vec4 p1 = gl_TessCoord.y * tcPosition[1];
+	//vec4 p2 = gl_TessCoord.z * tcPosition[2];
+	//gl_Position = p0 + p1 + p2;
 }

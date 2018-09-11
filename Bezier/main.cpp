@@ -90,10 +90,11 @@ int main()  {
 	curve_shader.use();
 	curve_shader.setVec3("color", glm::vec3(0.6f, 0.6f, 0.6f));
 
-	//加入着色控制器
-	Shader surface_shader("Surface.vs", "Surface.fs", "Surface.tc", "Surface.te");
-	surface_shader.use();
-	surface_shader.setMat4("mvp", projection * view * model);
+	//细分着色器程序
+	Shader surface_tess_shader("Surface.vs", "Surface.fs", "Surface.tc", "Surface.te");
+	surface_tess_shader.use();
+	surface_tess_shader.setMat4("mvp", projection * view * model);
+	surface_tess_shader.set1DFloat("common", surface.row * surface.column * 3, surface.common);
 
 	Shader ctrl_shader("Surface_ctrl.vs", "Curve.fs");
 	ctrl_shader.use();
@@ -116,9 +117,9 @@ int main()  {
 	//鼠标点击
 	bool firstMouseDown = true;
 	double downX;
-	double downY;
+	//double downY;
 	double offsetX = 0;
-	double offsetY = 0;
+	//double offsetY = 0;
 	const float SENSITIVITY = 0.01f;
 
 	//渲染周期
@@ -196,8 +197,8 @@ int main()  {
 						view = glm::lookAt(newPos, cameraTarget, worldUp);
 				
 						//更改着色器
-						surface_shader.use();
-						surface_shader.setMat4("mvp", projection * view * model);
+						surface_tess_shader.use();
+						surface_tess_shader.setMat4("mvp", projection * view * model);
 						ctrl_shader.use();
 						ctrl_shader.setMat4("mvp", projection * view * model);
 					}
@@ -209,9 +210,9 @@ int main()  {
 				ctrl_shader.use();
 				surface.DrawCtrlPoints();
 				glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-				//surface.DrawCtrlMesh();
+				surface.DrawCtrlMesh();
 
-				surface_shader.use();
+				surface_tess_shader.use();
 				//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 				surface.DrawBezierMesh();
 				break;

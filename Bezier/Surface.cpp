@@ -9,11 +9,9 @@ Surface::Surface(int _row, int _column, int mrow, int mcolumn): row(_row), colum
 
 	//对不同的(u, v)得到的相应的曲面点进行存储
 	Bezier = new float[(m_row + 1)*(m_column + 1) * 3];
-
+	UV = new float[(m_row + 1)*(m_column + 1) * 2];
 	//对共有部分进行存储
-	common = new point3*[row];
-	for (int i = 0; i < row; i++)
-		common[i] = new point3[column];
+	common = new float[row * column * 3];
 
 	//一个四边形有6个顶点索引
 	b_index = new unsigned int[m_row * m_column * 6];
@@ -47,6 +45,12 @@ void Surface::GLInit() {
 	glBufferData(GL_ARRAY_BUFFER, (m_row + 1)*(m_column + 1) * 3 * sizeof(float), NULL, GL_STATIC_DRAW);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
+	//曲面点相应的uv:也算是一个尝试，将同一个VAO的不同属性连接至不同的缓存
+	glGenBuffers(1, &uvvbo);
+	glBindBuffer(GL_ARRAY_BUFFER, uvvbo);
+	glBufferData(GL_ARRAY_BUFFER, (m_row + 1)*(m_column + 1) * 2 * sizeof(float), NULL, GL_STATIC_DRAW);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(1);
 	//索引
 	glGenBuffers(1, &bebo);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bebo);
@@ -60,10 +64,9 @@ void Surface::GLInit() {
 Surface::~Surface() {
 	//释放数组
 	delete[] Bezier;
+	delete[] UV;
 	delete[] b_index;
 	delete[] c_index;
-	for (int i = 0; i < row; i++)
-		delete[] common[i];
 	delete[] common;
 
 	//删除
@@ -74,6 +77,7 @@ Surface::~Surface() {
 	glDeleteVertexArrays(1, &bvao);
 	glDeleteBuffers(1, &bvbo);
 	glDeleteBuffers(1, &bebo);
+	glDeleteBuffers(1, &uvvbo);
 }
 
 //组合数计算
@@ -105,9 +109,9 @@ point3 Surface::P(double u, double v) {
 			//根据(i, j)获取相应的控制点
 			int pos = (i * row + j) * 3;
 			double c = pow(u, i) * pow(1 - u, row - 1 - i) * pow(v, j) * pow(1 - v, column - 1 - j);
-			result.x += common[i][j].x * c;
-			result.y += common[i][j].y * c;
-			result.z += common[i][j].z * c;
+			result.x += common[pos + 0] * c;
+			result.y += common[pos + 1] * c;
+			result.z += common[pos + 2] * c;
 		}
 	}
 	return result;
@@ -120,9 +124,9 @@ void Surface::ComputeBezier() {
 		for (int j = 0; j < column; j++) {
 			int pos = (i * row + j) * 3;
 			double c = C(row - 1, i) * C(column - 1, j);
-			common[i][j].x = c * ctrlPoint[pos + 0];
-			common[i][j].y = c * ctrlPoint[pos + 1];
-			common[i][j].z = c * ctrlPoint[pos + 2];
+			common[pos + 0] = c * ctrlPoint[pos + 0];
+			common[pos + 1] = c * ctrlPoint[pos + 1];
+			common[pos + 2] = c * ctrlPoint[pos + 2];
 		}
 
 	//计算曲面点
@@ -132,16 +136,24 @@ void Surface::ComputeBezier() {
 		for (int j = 0; j <= m_column; j++) {
 			v = j * space_column;
 			point3 point = P(u, v);
-			int pos = (i * (m_row + 1) + j) * 3;
+			int c = i * (m_row + 1) + j;
+			
+			int pos = c * 3;
 			Bezier[pos + 0] = point.x;
 			Bezier[pos + 1] = point.y;
 			Bezier[pos + 2] = point.z;
+			
+			pos = c * 2;
+			UV[pos + 0] = u;
+			UV[pos + 1] = v;
 		}
 	}
 
 	//更新缓冲
 	glBindBuffer(GL_ARRAY_BUFFER, bvbo);
 	glBufferSubData(GL_ARRAY_BUFFER, 0, (m_row + 1) * (m_column + 1) * 3 * sizeof(float), Bezier);
+	glBindBuffer(GL_ARRAY_BUFFER, uvvbo);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, (m_row + 1)*(m_column + 1) * 2 * sizeof(float), UV);
 }
 
 //根据离散的控制点或计算点绘制网格， 预计算所有的索引
